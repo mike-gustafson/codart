@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-8">
+                
+                {% for dart in darts %}
+                        <div class="card border-secondary mb-3 col-8">
+                            <h5 class="card-header p-0 m-0" style="height: 50px">
+                                <img src="{{ dart.user.profile.profile_image.url }}" class="h-100 img-thumbnail rounded-circle" alt="Profile Image">
+                                <a href="{% url 'profile' dart.user.id %}">@{{ dart.user.username|lower }}</a>
+                                {{ dart.title }}
+                            </h5>
+                            <div class="card-body text-secondary">
+                                <h5 class="card-title">{{ dart.description }}</h5>
+                                <p class="card-text">
+                                    <code>
+                                    {{ dart.code_block }}
+                                    </code>
+                                </p>
+                                <p class="card-text">
+                                    <small class="text-body-secondary">posted: {{ dart.date_created }}</small></p>
+                            </div>
+                        </div>
+                    {% endfor %}
+            </div>
+            <div class="col-md-4">
+                {% if form %}
+                <form method=POST>
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">Throw</button>
+                </form>
+                {% endif %}
+            </div>  
+        </div>  
+    </div>
+    
+
+
+
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+    {% if user.is_authenticated %}
+        <div class="col-6 offset-md-3">
+            <h1> You are already logged in </h1>
+            <br/>
+            <a href="{% url 'logout' %}" class="btn btn-outline-secondary">Logout</a>
+        </div>
+        {% else %}
+        <div class="col-6 offset-md-3">    
+            <h1> login </h1>
+            <br/>
+            <form method=POST action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input type="text" class="form-control" name="username" placeholder="Enter your username">
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="form-control" name="password" placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-outline-secondary">
+                    Login
+                </button>
+            </form>
+        </div>
+    {% endif %}
+    </div>
+</div>  
+{% endblock %}
