@@ -169,8 +169,8 @@ def dart_dislike(request, pk):
     
 def delete_dart(request, pk):
     if request.user.is_authenticated:
+        dart = get_object_or_404(Dart, id=pk)
         if request.user.username == dart.user.username:
-            dart = get_object_or_404(Dart, id=pk)
             dart.delete()
             messages.success(request, f'Dart deleted successfully')
             return redirect(request.META.get("HTTP_REFERER"))
