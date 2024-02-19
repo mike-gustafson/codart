@@ -26,13 +26,13 @@
 
                             <div class="card-footer bg-transparent border-secondary">
                                 <a href="#" class="like-btn {% if request.user in dart.likes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
-                                    <img src="https://codart-image-storage.s3.us-west-2.amazonaws.com/icons/heart-solid.svg" alt="like" style="width: 20px; height: 20px;">
+                                    <i class="fa-solid fa-heart"></i>
                                     <span class="likes-count text-dark" style="text-decoration: none !important;"> {{ dart.likes.count }}</span>
                                 </a>
                                 ||
                                 <a href="#" class="dislike-btn {% if request.user in dart.dislikes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
-                                    <img src="https://codart-image-storage.s3.us-west-2.amazonaws.com/icons/thumbs-down-solid.svg" alt="dislike" style="width: 20px; height: 20px;">
-                                    <span class="dislikes-count text-dark""> {{ dart.dislikes.count }}</span>
+                                    <i class="fa-solid fa-thumbs-down"></i>
+                                    <span class="dislikes-count text-dark"> {{ dart.dislikes.count }}</span>
                                 </a>
                             </div>
                         </div>
@@ -59,14 +59,14 @@ document.addEventListener("DOMContentLoaded", function() {
     
     var csrfToken = '{{ csrf_token }}';
 
-    function toggleButtonState(button, isActive) {
-        // Assuming you have specific classes for active/inactive states
+    function toggleButtonState(button, isActive, colorClass) {
+        allColorClasses = ['text-success', 'text-danger', 'text-warning'];
         if (isActive) {
-            button.classList.add("text-danger");
+            button.classList.add(colorClass);
             button.classList.remove("text-muted");
         } else {
             button.classList.add("text-muted");
-            button.classList.remove("text-danger");
+            button.classList.remove(...allColorClasses);
         }
     }
 
@@ -94,8 +94,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 dislikesCountElem.textContent = data.dislikes_count;
 
                 var dislikeButton = card.querySelector('.dislike-btn');
-                toggleButtonState(this, data.liked);
-                toggleButtonState(dislikeButton, false);
+                toggleButtonState(this, data.liked, 'text-danger');
+                toggleButtonState(dislikeButton, false, null);
             });
         });
     });
@@ -124,8 +124,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 dislikesCountElem.textContent = data.dislikes_count;
 
                 var likeButton = card.querySelector('.like-btn');
-                toggleButtonState(this, data.disliked);
-                toggleButtonState(likeButton, false);
+                toggleButtonState(this, data.disliked, 'text-warning');
+                toggleButtonState(likeButton, false, null);
             })
         });
     });
