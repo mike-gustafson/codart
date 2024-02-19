@@ -12,9 +12,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
-import dotenv
+from dotenv import load_dotenv
 
-dotenv.load_dotenv()
+load_dotenv()
 
 # AWS s3 bucket variable from secret
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
