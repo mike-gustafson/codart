@@ -26,12 +26,12 @@
 
                             <div class="card-footer bg-transparent border-secondary">
                                 <a href="#" class="like-btn {% if request.user in dart.likes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
-                                    <i class="fa-solid fa-heart"></i>
+                                    <img src="https://codart-image-storage.s3.us-west-2.amazonaws.com/icons/heart-solid.svg" alt="like" style="width: 20px; height: 20px;">
                                     <span class="likes-count text-dark" style="text-decoration: none !important;"> {{ dart.likes.count }}</span>
                                 </a>
                                 ||
                                 <a href="#" class="dislike-btn {% if request.user in dart.dislikes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
-                                    <i class="fa-solid fa-thumbs-down"></i>
+                                    <img src="https://codart-image-storage.s3.us-west-2.amazonaws.com/icons/thumbs-down-solid.svg" alt="dislike" style="width: 20px; height: 20px;">
                                     <span class="dislikes-count text-dark""> {{ dart.dislikes.count }}</span>
                                 </a>
                             </div>
