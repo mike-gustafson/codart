@@ -33,8 +33,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-qdc@0ga!cb&fkzpuovdu5m$1mzr#e3@s%)a%2t17sy4pw!1@^t'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -43,6 +41,7 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     'fontawesomefree',
+    'whitenoise.runserver_nostatic',
     'storages',
     'boto3',
     'django.contrib.auth',
