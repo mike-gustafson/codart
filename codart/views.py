@@ -3,6 +3,8 @@ from django.contrib import messages
 from .models import Profile, Dart
 from .forms import DartForm, SignUpForm, ProfilePictureForm
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import UserCreationForm
+from django import forms
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 

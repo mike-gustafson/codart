@@ -33,6 +33,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-qdc@0ga!cb&fkzpuovdu5m$1mzr#e3@s%)a%2t17sy4pw!1@^t'
 
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -41,20 +42,20 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     'fontawesomefree',
-    'whitenoise.runserver_nostatic',
     'storages',
     'boto3',
     'django.contrib.auth',
-    'codart',
     'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'codart',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -132,6 +133,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 MEDIA_URL = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 #MEDIA_ROOT = os.path.join(DEFAULT_FILE_STORAGE, 'media')
 
 # Default primary key field type
