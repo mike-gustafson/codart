@@ -42,6 +42,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'fontawesomefree',
     'storages',
     'boto3',
     'django.contrib.auth',

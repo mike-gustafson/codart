@@ -13,24 +13,47 @@
                 <br/><br/>
                 {% if darts %}
                     <h3>Darts</h3>
-                {% for dart in darts %}
-                        <div class="card border-secondary mb-3 col-8">
-                            <h5 class="card-header">
-                                <a href="{% url 'profile' dart.user.id %}">@{{ dart.user.username|lower }}</a>
-                                {{ dart.title }}
-                            </h5>
-                            <div class="card-body text-secondary">
-                                <h5 class="card-title">{{ dart.description }}</h5>
-                                <p class="card-text">
-                                    <code>
-                                    {{ dart.code_block }}
-                                    </code>
-                                </p>
-                                <p class="card-text">
-                                    <small class="text-body-secondary">posted: {{ dart.date_created }}</small></p>
-                            </div>
+                    {% for dart in darts %}
+                    <div class="card border-secondary mb-3 col-8">
+                        <h5 class="card-header p-0 m-0" style="height: 50px">
+                            <img src="{{ dart.user.profile.profile_image.url }}" class="h-100 img-thumbnail rounded-circle" alt="{{ dart.user.first_name }} {{ dart.user.last_name }}'s Profile Photo">
+                            <a href="{% url 'profile' dart.user.id %}">@{{ dart.user.username|lower }}</a>
+                            {{ dart.title }}
+                        </h5>
+                        <div class="card-body text-secondary">
+                            <h5 class="card-title">{{ dart.description }}</h5>
+                            <p class="card-text">
+                                <code>
+                                {{ dart.code_block }} { white-space: pre }
+                                </code>
+                            </p>
+                            <p class="card-text">
+                                <small class="text-body-secondary">posted: {{ dart.date_created }}</small></p>
                         </div>
-                    {% endfor %}
+
+                        <div class="card-footer bg-transparent border-secondary">
+                            {% if user in dart.likes.all %} 
+                                <a href="{% url 'dart_like' dart.id %}"><i class="fa-solid fa-heart" style="color: red"></i></a>
+                            {% else %}
+                                <a href="{% url 'dart_like' dart.id %}"><i class="fa-solid fa-heart" style="color: lightgrey"></i></a>
+                            {% endif %}
+                            {{ dart.likes.count }}
+                            ||
+                            {% if user in dart.dislikes.all %} 
+                                <a href="{% url 'dart_dislike' dart.id %}"><i class="fa-solid fa-thumbs-down" style="color: black"></i></a>
+                            {% else %}
+                                <a href="{% url 'dart_dislike' dart.id %}"><i class="fa-solid fa-thumbs-down" style="color: lightgrey"></i></a>
+                            {% endif %}
+                            {{ dart.dislikes.count }}
+                            {% if request.user.id == dart.user.id %}
+                            ||
+                                <a href="{% url 'delete_dart' dart.id %}"><i class="fa-solid fa-trash-can" style="color: green"></i></a>
+                            ||
+                                <a href="{% url 'edit_dart' dart.id %}"><i class="fa-solid fa-pencil" style="color: blue"></i></a>
+                            {% endif %}
+                        </div>  
+                    </div>
+                {% endfor %}
                     
                 {% else %}
                     <h3>No Darts</h3>
@@ -77,6 +100,7 @@
 
                 {% if request.user.id == profile.user.id %}
                     <a href="{% url 'edit_profile' %}" class="btn btn-outline-secondary">Edit Profile</a>
+                    <a href="{% url 'delete_profile' %}" class="btn btn-outline-danger">Delete Profile</a>
                 {% endif %}
 
             </div>

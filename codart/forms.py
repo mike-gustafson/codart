@@ -17,7 +17,7 @@ class DartForm(forms.ModelForm):
 
     class Meta:
         model = Dart
-        exclude = ("user",)
+        exclude = ("user", "likes", "dislikes")
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(

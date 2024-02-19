@@ -1,11 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Profile, Dart
 from .forms import DartForm, SignUpForm, ProfilePictureForm
 from django.contrib.auth import authenticate, login, logout
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 
 # Create your views here.
 def home(request):
@@ -122,4 +121,80 @@ def edit_profile(request):
     else:
         messages.success(request, f'You need to be logged in to edit your profile')
         return redirect('home')
+
+def dart_like(request, pk):
+    if request.user.is_authenticated:
+        dart = get_object_or_404(Dart, id=pk)\
+        
+        if dart.dislikes.filter(id=request.user.id).exists():
+            dart.dislikes.remove(request.user)
+
+        liked = not dart.likes.filter(id=request.user.id).exists()
+        if liked:
+            dart.likes.add(request.user)
+        else:
+            dart.likes.remove(request.user)
+
+        responce = {
+            'likes_count': dart.likes.count(),
+            'dislikes_count': dart.dislikes.count(),
+            'liked': liked
+        }
+        return JsonResponse(responce)
+
+def dart_dislike(request, pk):
+    if request.user.is_authenticated:
+        dart = get_object_or_404(Dart, id=pk)
+
+        if dart.likes.filter(id=request.user.id).exists():
+            dart.likes.remove(request.user)
+
+        disliked = not dart.dislikes.filter(id=request.user.id).exists()
+        if disliked:
+            dart.dislikes.add(request.user)
+        else:
+            dart.dislikes.remove(request.user)
+
+        responce = {
+            'likes_count': dart.likes.count(),
+            'dislikes_count': dart.dislikes.count(),
+            'disliked': disliked
+        }
+        return JsonResponse(responce)
+    else:
+        messages.success(request, f'You need to be logged in to like or dislike a dart')
+        return redirect(request.META.get("HTTP_REFERER"))
     
+def delete_dart(request, pk):
+    if request.user.is_authenticated:
+        if request.user.username == dart.user.username:
+            dart = get_object_or_404(Dart, id=pk)
+            dart.delete()
+            messages.success(request, f'Dart deleted successfully')
+            return redirect(request.META.get("HTTP_REFERER"))
+    else:
+        messages.success(request, f'You need to be logged in to delete a dart')
+        return redirect('home')
+    
+def delete_profile(request):
+    if request.user.is_authenticated:
+        user = User.objects.get(id=request.user.id)
+        user.delete()
+        messages.success(request, f'Account deleted successfully')
+        return redirect('home')
+    else:
+        messages.success(request, f'You need to be logged in to delete your account')
+        return redirect('home')
+    
+def edit_dart(request, pk):
+    if request.user.is_authenticated:
+        dart = get_object_or_404(Dart, id=pk)
+        form = DartForm(request.POST or None, instance=dart)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Dart updated successfully')
+            return redirect('profile', pk=request.user.id)    
+        return render(request, 'edit_dart.html', {"form": form})
+    else:
+        messages.success(request, f'You need to be logged in to edit a dart')
+        return redirect('home')

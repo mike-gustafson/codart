@@ -9,7 +9,7 @@
                 {% for dart in darts %}
                         <div class="card border-secondary mb-3 col-8">
                             <h5 class="card-header p-0 m-0" style="height: 50px">
-                                <img src="{{ dart.user.profile.profile_image.url }}" class="h-100 img-thumbnail rounded-circle" alt="Profile Image">
+                                <img src="{{ dart.user.profile.profile_image.url }}" class="h-100 img-thumbnail rounded-circle" alt="{{ dart.user.first_name }} {{ dart.user.last_name }}'s Profile Photo">
                                 <a href="{% url 'profile' dart.user.id %}">@{{ dart.user.username|lower }}</a>
                                 {{ dart.title }}
                             </h5>
@@ -17,11 +17,23 @@
                                 <h5 class="card-title">{{ dart.description }}</h5>
                                 <p class="card-text">
                                     <code>
-                                    {{ dart.code_block }}
+                                    {{ dart.code_block }} { white-space: pre }
                                     </code>
                                 </p>
                                 <p class="card-text">
                                     <small class="text-body-secondary">posted: {{ dart.date_created }}</small></p>
+                            </div>
+
+                            <div class="card-footer bg-transparent border-secondary">
+                                <a href="#" class="like-btn {% if request.user in dart.likes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
+                                    <i class="fa-solid fa-heart"></i>
+                                    <span class="likes-count text-dark" style="text-decoration: none !important;"> {{ dart.likes.count }}</span>
+                                </a>
+                                ||
+                                <a href="#" class="dislike-btn {% if request.user in dart.dislikes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
+                                    <i class="fa-solid fa-thumbs-down"></i>
+                                    <span class="dislikes-count text-dark""> {{ dart.dislikes.count }}</span>
+                                </a>
                             </div>
                         </div>
                     {% endfor %}
@@ -39,6 +51,89 @@
     </div>
     
 
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var likeButtons = document.querySelectorAll('.like-btn');
+    var dislikeButtons = document.querySelectorAll('.dislike-btn');
+    
+    var csrfToken = '{{ csrf_token }}';
+
+    function toggleButtonState(button, isActive) {
+        // Assuming you have specific classes for active/inactive states
+        if (isActive) {
+            button.classList.add("text-danger");
+            button.classList.remove("text-muted");
+        } else {
+            button.classList.add("text-muted");
+            button.classList.remove("text-danger");
+        }
+    }
+
+    likeButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            var dartId = this.getAttribute('data-dart-id');
+            var url = `{% url 'dart_like' 0 %}`.replace('/0/', `/${dartId}/`);
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({'dart_id': dartId})
+            })
+            .then(response => response.json())
+            .then(data => {
+                var card = this.closest('.card');
+                var dislikesCountElem = card.querySelector('.dislikes-count');
+                var likesCountElem = card.querySelector('.likes-count');
+
+                likesCountElem.textContent = data.likes_count;
+                dislikesCountElem.textContent = data.dislikes_count;
+
+                var dislikeButton = card.querySelector('.dislike-btn');
+                toggleButtonState(this, data.liked);
+                toggleButtonState(dislikeButton, false);
+            });
+        });
+    });
+
+    dislikeButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            var dartId = this.getAttribute('data-dart-id');
+            var url = `{% url 'dart_dislike' 0 %}`.replace('/0/', `/${dartId}/`);
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({'dart_id': dartId})
+            })
+            .then(response => response.json())
+            .then(data => {
+                var card = this.closest('.card');
+                var likesCountElem = card.querySelector('.likes-count');
+                var dislikesCountElem = card.querySelector('.dislikes-count');
+
+                likesCountElem.textContent = data.likes_count;
+                dislikesCountElem.textContent = data.dislikes_count;
+
+                var likeButton = card.querySelector('.like-btn');
+                toggleButtonState(this, data.disliked);
+                toggleButtonState(likeButton, false);
+            })
+        });
+    });
+});
+
+    </script>
+    
+    
 
 
 {% endblock %}

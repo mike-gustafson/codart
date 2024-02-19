@@ -10,6 +10,16 @@ class Dart(models.Model):
     code_block = models.TextField(max_length=1024)
     date_created = models.DateTimeField(auto_now_add=True)
     code_language = models.CharField(max_length=100)
+    likes = models.ManyToManyField(User, related_name='dart_likes', blank=True)
+    dislikes = models.ManyToManyField(User, related_name='dart_dislikes', blank=True)
+
+    # track number of likes
+    def total_likes(self):
+        return self.likes.count()
+    
+    # track number of dislikes
+    def total_dislikes(self):
+        return self.dislikes.count()
 
     def __str__(self):
         return(
@@ -25,6 +35,9 @@ class Profile(models.Model):
         symmetrical=False,
         blank=True)
     date_modified = models.DateTimeField(User, auto_now=True)
+    dart_likes = models.ManyToManyField(Dart, related_name='dart_likes', blank=True)
+    dart_dislikes = models.ManyToManyField(Dart, related_name='dart_dislikes', blank=True)
+
 
     def __str__(self):
         first_name = self.user.first_name
