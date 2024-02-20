@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Profile, Dart
-from .forms import DartForm, SignUpForm, ProfilePictureForm
+from .forms import DartForm, SignUpForm, ProfileForm, UserEditForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
 from django.http import JsonResponse
+
 
 # Create your views here.
 def home(request):
@@ -23,10 +24,17 @@ def home(request):
                 messages.success(request, f'Error: Dart not created')
                 return redirect('home')
         darts = Dart.objects.all().order_by('-date_created')
-        return render(request, 'home.html', {"darts": darts, "form": form})
+        # run fetch_news_from_newsapi function
+        news_request = request.GET.get('news')
+        news = fetch_news_from_newsapi(news_request)
+        return render(request, 'home.html', {"darts": darts, "form": form, "news": news})
     else:
         darts = Dart.objects.all().order_by('-date_created')
-        return render(request, 'home.html', {"darts": darts})
+        # run fetch_news_from_newsapi function
+        news_request = request.GET.get('news')
+        news = fetch_news_from_newsapi(news_request)
+        print(news)
+        return render(request, 'home.html', {"darts": darts, "news": news})
 
 
 def profile_list(request):
@@ -41,6 +49,7 @@ def profile_list(request):
 def profile(request, pk):
     if request.user.is_authenticated:
         profile = Profile.objects.get(user_id=pk)
+        print(profile)
         darts = Dart.objects.filter(user_id=pk).order_by('-date_created')
 
         # POST form logic
@@ -75,12 +84,12 @@ def login_user(request):
         if user is not None:
             login(request, user)
             messages.success(request, f'Welcome back {username}')
-            return redirect('home')
+            return redirect(request.META.get("HTTP_REFERER"))
         else:
             messages.success(request, f'Error: Invalid username or password')
-            return redirect('login')
+            return redirect(request.META.get("HTTP_REFERER"))
     else:
-        return render(request, 'login.html')
+        return redirect(request.META.get("HTTP_REFERER"))
 
 def logout_user(request):
     logout(request)
@@ -102,27 +111,30 @@ def register_user(request):
             messages.success(request, f'Welcome {username}')
             return redirect('home')
         
-    return render(request, 'register.html', {"form": form})
+    return redirect('profile', pk=request.user.id)
 
 def edit_profile(request):
     if request.user.is_authenticated:
-        user = User.objects.get(id=request.user.id)
-        profile = Profile.objects.get(user__id=request.user.id)
+        if request.method == 'POST':
+            user_form = UserEditForm(request.POST, instance=request.user)
+            profile_form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+            if user_form.is_valid() and profile_form.is_valid():
+                user_form.save()
+                print(request.POST)
 
-        user_form = SignUpForm(request.POST or None, request.FILES or None, instance=user)
-        profile_form = ProfilePictureForm(request.POST or None, request.FILES or None, instance=profile)
+                if request.POST['profile_image']:
+                    print('profile image found')
+                    profile_form.profile_image = request.POST['profile_image']
+                    profile_form.save()
+                    print('profile image saved')
 
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            login(request, user)
-            messages.success(request, f'Profile updated successfully')
-            return redirect('profile', pk=request.user.id)
-        
-        return render(request, 'edit_profile.html', {"profile": profile, "user_form": user_form, "profile_form": profile_form})
-    else:
-        messages.success(request, f'You need to be logged in to edit your profile')
-        return redirect('home')
+
+                messages.success(request, 'Profile updated successfully')
+                return redirect('profile', pk=request.user.pk)
+        else:
+            user_form = UserEditForm(instance=request.user)
+            profile_form = ProfileForm(instance=request.user.profile)
+            return render(request, 'edit_profile.html', {'user_form': user_form, 'profile_form': profile_form})
 
 def dart_like(request, pk):
     if request.user.is_authenticated:
@@ -200,3 +212,21 @@ def edit_dart(request, pk):
     else:
         messages.success(request, f'You need to be logged in to edit a dart')
         return redirect('home')
+    
+def fetch_news_from_newsapi(request):
+    import requests
+    import json
+    url = 'https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty'
+    list_of_stories = requests.get(url)
+    news_urls = []
+    story_count = 0
+    for story in list_of_stories.json():
+        story_count += 1
+        print(story_count)
+        if story_count > 6:
+            break
+        story_url = f'https://hacker-news.firebaseio.com/v0/item/{story}.json?print=pretty'
+        news_urls.append(story_url)
+    news = news_urls
+    print(news)
+    return news

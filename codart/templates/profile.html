@@ -63,6 +63,28 @@
 
                 <br/>
                 <div class="card border-secondary mb-3">
+                    <h5 class="card-header">User Details</h5>
+                    <div class="card-body">
+                        <p class="card-text text-start">
+                            <span class="">Username: {{ user.username }}</span><br/>
+                            <span class="">Name: {{ profile.user.first_name }} {{ profile.user.last_name }}</span><br/>
+                            <span class="">E-Mail: {{ profile.user.email }}</span><br/>
+                            <span class="">Last updated: {{ profile.date_modified }}</span><br/>
+                        </p>
+                    </div>
+                </div>
+                <div class="card border-secondary mb-3">
+                    <h5 class="card-header">Followed By</h5>
+                    <div class="card-body">
+                        <p class="card-text">
+                            {% for followed_by in profile.followed_by.all %}
+                            <a href = "{% url 'profile' followed_by.user.id %}">{{ followed_by }}</a><br/>
+                            {% endfor %}            
+                        </p>
+                    </div>
+                </div>
+                <br/>
+                <div class="card border-secondary mb-3">
                     <h5 class="card-header">Follows</h5>
                     <div class="card-body">
                         <p class="card-text">
@@ -94,14 +116,60 @@
                 <br/>
 
                 {% if request.user.id == profile.user.id %}
-                    <a href="{% url 'edit_profile' %}" class="btn btn-outline-secondary">Edit Profile</a>
-                    <a href="{% url 'delete_profile' %}" class="btn btn-outline-danger">Delete Profile</a>
+                <a class="nav-link" href="" data-bs-toggle="modal" data-bs-target="#editModal">Register</a>
+                <a href="{% url 'delete_profile' %}" class="btn btn-outline-danger">Delete Profile</a>
                 {% endif %}
 
             </div>
         </div>
     </div>  
-
+ 
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 fw-bolder" id="editModalLabel">Editing your user details</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        {% if user.is_authenticated %}
+                            <div class="col-6 offset-md-3">    
+                                <form method=POST action="{% url 'edit_profile' %}">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        Username<input type="text" class="form-control" name="username" value="{{ user.username }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        E-Mail<input type="email" class="form-control" name="email" value="{{ user.email }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        First Name<input type="text" class="form-control" name="first_name" value="{{ user.first_name }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        Last Name<input type="text" class="form-control" name="last_name" value="{{ user.last_name }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        Profile Image<input type="file" class="form-control" name="profile_image" value="{{ user.profile_image }}">
+                                    </div>
+                                    <button type="submit" class="btn btn-outline-secondary">
+                                        Submit Changes
+                                    </button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <div class="col-8 offset-md-3">
+                                <h1> You are already logged in </h1>
+                                <br/>
+                                <a href="{% url 'logout' %}" class="btn btn-outline-secondary">Logout</a>
+                            </div>
+                            
+                        {% endif %}
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endif %}
 
@@ -185,5 +253,5 @@
     });
     
         </script>
-    
+   
 {% endblock %}

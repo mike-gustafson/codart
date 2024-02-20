@@ -5,9 +5,11 @@
     <div class="container">
         <div class="row">
             <div class="col-8">
-                
+                <button type="button" class="btn btn-primary mb-1" data-bs-toggle="modal" data-bs-target="#dartModal" >
+                    Throw a Dart
+                </button>
                 {% for dart in darts %}
-                        <div class="card border-secondary mb-3 col-8">
+                        <div class="card border-secondary mb-3 col-10">
                             <h5 class="card-header p-0 m-0" style="height: 50px">
                                 <img src="{{ dart.user.profile.profile_image.url }}" class="h-100 img-thumbnail rounded-circle" alt="{{ dart.user.first_name }} {{ dart.user.last_name }}'s Profile Photo">
                                 <a href="{% url 'profile' dart.user.id %}">@{{ dart.user.username|lower }}</a>
@@ -39,17 +41,60 @@
                     {% endfor %}
             </div>
             <div class="col-md-4">
-                {% if form %}
-                <form method=POST>
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit" class="btn btn-primary">Throw</button>
-                </form>
-                {% endif %}
+                
+                {% for article in news %}
+                <div class="card bg-gray-200">
+                    <div class="card-body">
+                        <p class="card-title">{{ article.title }}
+                        {% if article.urlToImage %}
+                        <img src="{{ article.urlToImage }}" class="img-fluid" alt="{{ article.title }}">
+                        {% endif %}
+                        <a href="{{ article.url }}" class="btn btn-outline-primary">Read More</a>
+                        </p>
+                    </div>  
+                </div>
+                <br />
+                {% endfor %}
             </div>  
         </div>  
     </div>
     
+<!-- Modal -->
+<div class="modal fade" id="dartModal" tabindex="-1" aria-labelledby="dartModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="dartModalLabel">Throw A Dart</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            {% if form %}
+            <form method=POST>
+                {% csrf_token %}
+                <div class="modal-body">            
+                    <div>        
+                        {{ form.title }}<br />
+                        {{ form.title.errors }}
+                    </div>
+                    <div>
+                        {{ form.description }}<br />
+                    </div>
+                    <div>
+                        {{ form.code_language }}<br />
+                    </div>
+                    <div>
+                        {{ form.code_block }}<br />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="">Throw</button>
+                </div>  
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
 
 
 <script>

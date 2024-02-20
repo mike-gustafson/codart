@@ -22,10 +22,10 @@
                 </li>
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="" data-bs-toggle="modal" data-bs-target="#exampleModal">Login</a>
+                    <a class="nav-link" href="" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    <a class="nav-link" href="" data-bs-toggle="modal" data-bs-target="#registerModal">Register</a>
                 </li>
             {% endif %}
 
@@ -48,40 +48,88 @@
     </div>
 </nav>
 
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Login</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <div class="row">
-                {% if user.is_authenticated %}
-                    <div class="col-8 offset-md-3">
-                        <h1> You are already logged in </h1>
-                        <br/>
-                        <a href="{% url 'logout' %}" class="btn btn-outline-secondary">Logout</a>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5 fw-bolder" id="loginModalLabel">Welcome to Codart</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    {% if user.is_authenticated %}
+                        <div class="col-8 offset-md-3">
+                            <h1> You are already logged in </h1>
+                            <br/>
+                            <a href="{% url 'logout' %}" class="btn btn-outline-secondary">Logout</a>
+                        </div>
+                    {% else %}
+                        <div class="col-6 offset-md-3">    
+                            <form method=POST action="{% url 'login' %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="username" placeholder="Enter your username">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" name="password" placeholder="Enter your password">
+                                </div>
+                                <button type="submit" class="btn btn-outline-secondary">
+                                    Login
+                                </button>
+                                <br />
+                                Not a user? <a href="{% url 'register' %}">Register</a> now to join the community.
+                            </form>
+                        </div>
+                    {% endif %}
                     </div>
-                {% else %}
-                    <div class="col-6 offset-md-3">    
-                        <form method=POST action="{% url 'login' %}">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <input type="text" class="form-control" name="username" placeholder="Enter your username">
-                            </div>
-                            <div class="mb-3">
-                                <input type="password" class="form-control" name="password" placeholder="Enter your password">
-                            </div>
-                            <button type="submit" class="btn btn-outline-secondary">
-                                Login
-                            </button>
-                        </form>
-                    </div>
-                {% endif %}
-                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
+
+<!-- Register Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5 fw-bolder" id="registerModalLabel">Join Codart today!</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    {% if user.is_authenticated %}
+                        <div class="col-8 offset-md-3">
+                            <h1> You are already logged in </h1>
+                            <br/>
+                            <a href="{% url 'logout' %}" class="btn btn-outline-secondary">Logout</a>
+                        </div>
+                    {% else %}
+                        <div class="col-6 offset-md-3">    
+                            <form method=POST action="{% url 'register' %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="username" placeholder="Enter your username">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="email" class="form-control" name="email" placeholder="Enter your email">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" name="password1" placeholder="Enter your password">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" name="password2" placeholder="Confirm your password">
+                                </div>
+                                <button type="submit" class="btn btn-outline-secondary">
+                                    Register
+                                </button>
+                                <br />
+                                Already a user? <a href="" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a> now to join the community.
+                            </form>
+                        </div>
+                    {% endif %}
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>

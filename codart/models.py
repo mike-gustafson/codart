@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+from PIL import Image
 
 # Create Dart model
 class Dart(models.Model):
@@ -13,10 +14,12 @@ class Dart(models.Model):
     likes = models.ManyToManyField(User, related_name='dart_likes', blank=True)
     dislikes = models.ManyToManyField(User, related_name='dart_dislikes', blank=True)
 
+
     # track number of likes
     def total_likes(self):
         return self.likes.count()
     
+
     # track number of dislikes
     def total_dislikes(self):
         return self.dislikes.count()
@@ -25,6 +28,14 @@ class Dart(models.Model):
         return(
             f"User: {self.user}, Title: {self.title}, Description: {self.description}, Code Block: {self.code_block}"
         )
+
+# Model for saving hacker-news articles to the database in order to keep load times down
+class NewsStory(models.Model):
+    link = models.URLField()
+    # Add other fields as necessary, such as publication date, author, etc.
+
+    def __str__(self):
+        return self.title
 
 # Create your models here.
 class Profile(models.Model):
@@ -38,7 +49,15 @@ class Profile(models.Model):
     dart_likes = models.ManyToManyField(Dart, related_name='dart_likes', blank=True)
     dart_dislikes = models.ManyToManyField(Dart, related_name='dart_dislikes', blank=True)
 
+    # def save(self, *args, **kwargs):
+    #     super(Profile, self).save(*args, **kwargs)
+    #     image = Image.open(self.profile_image.path)
 
+    #     if image.height > 300 or image.width > 300:
+    #         output_size = (300, 300)
+    #         image.thumbnail(output_size)
+    #         image.save(self.profile_image.path)
+            
     def __str__(self):
         first_name = self.user.first_name
         last_name = self.user.last_name
