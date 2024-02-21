@@ -63,7 +63,14 @@
 
                 <br/>
                 <div class="card border-secondary mb-3">
-                    <h5 class="card-header">User Details</h5>
+                    <h5 class="card-header">
+                        User Details
+                        {% if request.user.id == profile.user.id %}
+                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal">
+                                Edit
+                            </button>
+                        {% endif %}
+                    </h5>
                     <div class="card-body">
                         <p class="card-text text-start">
                             <span class="">Username: {{ user.username }}</span><br/>
@@ -71,37 +78,47 @@
                             <span class="">E-Mail: {{ profile.user.email }}</span><br/>
                             <span class="">Last updated: {{ profile.date_modified }}</span><br/>
                         </p>
+                        <ul class="social mb-0 list-inline mt-3">
+                            <li class="list-inline-item"><a href="#" class="social-link"><i class="fa fa-facebook-f"></i></a></li>
+                            <li class="list-inline-item"><a href="#" class="social-link"><i class="fa fa-twitter"></i></a></li>
+                            <li class="list-inline-item"><a href="#" class="social-link"><i class="fa fa-instagram"></i></a></li>
+                            <li class="list-inline-item"><a href="#" class="social-link"><i class="fa fa-linkedin"></i></a></li>
+                        </ul>
                     </div>
                 </div>
                 <div class="card border-secondary mb-3">
                     <h5 class="card-header">Followed By</h5>
-                    <div class="card-body">
-                        <p class="card-text">
+                    <div class="card-body p-0">
                             {% for followed_by in profile.followed_by.all %}
-                            <a href = "{% url 'profile' followed_by.user.id %}">{{ followed_by }}</a><br/>
-                            {% endfor %}            
-                        </p>
+                                {% if followed_by.user.id != profile.user.id %}
+                                <div class="row">
+                                    <div class="col-6 text-end pr-1">
+                                        <a href = "{% url 'profile' followed_by.user.id %}">@{{ followed_by.user.username }}</a>
+                                    </div>
+                                    <div class="col-6 text-start p-0">
+                                        {{ followed_by.user.first_name }} {{ followed_by.user.last_name }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
                     </div>
                 </div>
                 <br/>
                 <div class="card border-secondary mb-3">
                     <h5 class="card-header">Follows</h5>
-                    <div class="card-body">
-                        <p class="card-text">
+                    <div class="card-body p-0">
                             {% for follow in profile.follow.all %}
-                                <a href = "{% url 'profile' follow.user.id %}">{{ follow }}</a><br/>
-                            {% endfor %}            
-                        </p>
-                    </div>
-                </div>
-                <div class="card border-secondary mb-3">
-                    <h5 class="card-header">Followed By</h5>
-                    <div class="card-body">
-                        <p class="card-text">
-                            {% for followed_by in profile.followed_by.all %}
-                            <a href = "{% url 'profile' followed_by.user.id %}">{{ followed_by }}</a><br/>
-                            {% endfor %}            
-                        </p>
+                                {% if follow.user.id != profile.user.id %}
+                                <div class="row">
+                                    <div class="col-6 text-end pr-1">
+                                        <a href = "{% url 'profile' follow.user.id %}">@{{ follow.user.username }}</a>
+                                    </div>
+                                    <div class="col-6 text-start p-0">
+                                        {{ follow.user.first_name }} {{ follow.user.last_name }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
                     </div>
                 </div>
                 <br/>
@@ -114,12 +131,6 @@
                     {% endif %}
                 </form>
                 <br/>
-
-                {% if request.user.id == profile.user.id %}
-                <a class="nav-link" href="" data-bs-toggle="modal" data-bs-target="#editModal">Register</a>
-                <a href="{% url 'delete_profile' %}" class="btn btn-outline-danger">Delete Profile</a>
-                {% endif %}
-
             </div>
         </div>
     </div>  
@@ -134,8 +145,8 @@
                 <div class="modal-body">
                     <div class="row">
                         {% if user.is_authenticated %}
-                            <div class="col-6 offset-md-3">    
-                                <form method=POST action="{% url 'edit_profile' %}">
+                            <div class="col-12">    
+                                <form method=POST action="{% url 'edit_profile' %}" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <div class="mb-3">
                                         Username<input type="text" class="form-control" name="username" value="{{ user.username }}">
@@ -155,7 +166,15 @@
                                     <button type="submit" class="btn btn-outline-secondary">
                                         Submit Changes
                                     </button>
+                                    {% if request.user.id == profile.user.id %}
+                                    <a href="{% url 'delete_profile' %}" class="btn btn-outline-danger">Delete Profile</a>
+                                    {% endif %}
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" aria-label="Close">
+                                        Cancel
+                                    </button>
+
                                 </form>
+                                <br />
                             </div>
                         {% else %}
                             <div class="col-8 offset-md-3">

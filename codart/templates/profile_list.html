@@ -3,36 +3,60 @@
 
 {% block content %}
 
+<style>
+    .profile-grid-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .profile-grid-item {
+        flex: 1; /* Allows items to grow */
+        min-width: 250px; /* Adjust min-width based on your content */
+        max-width: 300px; /* Adjust max-width based on your preference */
+        margin: 10px; /* Adds some space around items */
+    }
+
+    .profile-link {
+        display: block; /* Makes the link block-level for full area clickability */
+        text-decoration: none;
+        color: inherit;
+        text-align: center; /* Center-aligns the text within each link */
+    }
+
+    .profile-content {
+        border: 1px solid #ddd; /* Optional: adds a border around the content */
+        padding: 15px; /* Adjusts padding inside each item */
+        border-radius: 5px; /* Optional: rounds corners */
+        background-color: #f9f9f9; /* Optional: sets a background color */
+    }
+</style>
+
 <h1>Profile List</h1>
-<br/>
 
 {% if profiles %}
-    {% for profile in profiles %}
-        
-        <div class="card mb-3" style="max-width: 540px;">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    {% if profile.profile_image %}
-                        <img src="{{ profile.profile_image.url }}" class="col-6 img-thumbnail rounded-pill" alt="Profile Image">
-                    {% else %}
-                        <img src="{% static 'images/profile_defualt.png' %}" class="col-6 img-thumbnail rounded-pill" alt="Profile Image">
-                    {% endif %}
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ profile.user.username }}</h5>
-                        <p class="card-text">
-                            <a href="{% url 'profile' profile.user.id %}">@{{ profile.user.username|lower }}</a>
-                        </p>
-                        <p class="card-text"><small class="text-body-secondary">Last Activity: {{ profile.date_modified }}</small></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <br/>
-        <br/>
+<div class="container">
+    <div class="row">
+        <div class="profile-grid-container">
+        {% for profile in profiles %}
 
-    {% endfor %}
-    
+            <div class="profile-grid-item">
+                <a href="{% url 'profile' profile.user.id %}" class="profile-link">
+                    <div class="profile-content">
+                        {% if profile.profile_image %}
+                            <img src="{{ profile.profile_image.url }}" alt="" class="img-fluid rounded-circle mb-3" style="width: 100px; height: 100px;">
+                        {% else %}
+                            <img src="{% static 'images/profile_default.png' %}" alt="" class="img-fluid rounded-circle mb-3" style="width: 100px;">
+                        {% endif %}
+                        <h5>{{ profile.user.first_name }} {{ profile.user.last_name }}</h5>
+                        <span class="small text-uppercase text-muted">@{{ profile.user.username }}</span>
+                    </div>
+                </a>
+            </div>
+
+        {% endfor %}
+        </div>
+    </div>
+</div>
 {% endif %}
 {% endblock %}

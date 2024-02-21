@@ -115,20 +115,16 @@ def register_user(request):
 
 def edit_profile(request):
     if request.user.is_authenticated:
+        current_user = User.objects.get(id=request.user.id)
+        profile_user = Profile.objects.get(user_id=request.user.id)
+
         if request.method == 'POST':
-            user_form = UserEditForm(request.POST, instance=request.user)
-            profile_form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+            user_form = UserEditForm(request.POST, instance=current_user)
+            profile_form = ProfileForm(request.POST, request.FILES, instance=profile_user)
             if user_form.is_valid() and profile_form.is_valid():
                 user_form.save()
-                print(request.POST)
-
-                if request.POST['profile_image']:
-                    print('profile image found')
-                    profile_form.profile_image = request.POST['profile_image']
-                    profile_form.save()
-                    print('profile image saved')
-
-
+                profile_form.save()
+                login(request, current_user)
                 messages.success(request, 'Profile updated successfully')
                 return redirect('profile', pk=request.user.pk)
         else:
