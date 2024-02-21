@@ -42,19 +42,10 @@
             </div>
             <div class="col-md-4">
                 
-                {% for article in news %}
-                <div class="card bg-gray-200">
-                    <div class="card-body">
-                        <p class="card-title">{{ article.title }}
-                        {% if article.urlToImage %}
-                        <img src="{{ article.urlToImage }}" class="img-fluid" alt="{{ article.title }}">
-                        {% endif %}
-                        <a href="{{ article.url }}" class="btn btn-outline-primary">Read More</a>
-                        </p>
-                    </div>  
+                <div id="news-stories">
+                    <h2>Latest From <a href="https://news.ycombinator.com/" class="text-decoration-none">Hacker News</a></h2>
+                    <!-- News stories will be loaded here -->
                 </div>
-                <br />
-                {% endfor %}
             </div>  
         </div>  
     </div>
@@ -176,7 +167,27 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-    </script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/fetch-news/')
+    .then(response => response.json())
+    .then(data => {
+        let newsContainer = document.getElementById('news-stories');
+        data.news.forEach(story => {
+            let storyElement = document.createElement('div');
+            storyElement.innerHTML = `
+            <a href="${story.url}" target="_blank" class="text-decoration-none">
+            <div class="card border border-secondary rounded my-1 hover-overlay">
+                <h3>${story.title}</h3>
+                <p>${story.by}</p>
+                </div>
+                </a>
+            `;
+            newsContainer.appendChild(storyElement);
+        });
+    });
+});
+
+</script>
     
     
 

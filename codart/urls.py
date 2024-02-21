@@ -14,4 +14,6 @@ urlpatterns = [
     path('delete_dart/<int:pk>/', views.delete_dart, name='delete_dart'),
     path('delete_profile/', views.delete_profile, name='delete_profile'),
     path('edit_dart/<int:pk>/', views.edit_dart, name='edit_dart'),
+    path('fetch-news/', views.fetch_news, name='fetch-news'),
+
 ]

@@ -7,8 +7,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-
-
 # Create your views here.
 def home(request):
     if request.user.is_authenticated:
@@ -24,17 +22,10 @@ def home(request):
                 messages.success(request, f'Error: Dart not created')
                 return redirect('home')
         darts = Dart.objects.all().order_by('-date_created')
-        # run fetch_news_from_newsapi function
-        news_request = request.GET.get('news')
-        news = fetch_news_from_newsapi(news_request)
-        return render(request, 'home.html', {"darts": darts, "form": form, "news": news})
+        return render(request, 'home.html', {"darts": darts, "form": form})
     else:
         darts = Dart.objects.all().order_by('-date_created')
-        # run fetch_news_from_newsapi function
-        news_request = request.GET.get('news')
-        news = fetch_news_from_newsapi(news_request)
-        print(news)
-        return render(request, 'home.html', {"darts": darts, "news": news})
+        return render(request, 'home.html', {"darts": darts})
 
 
 def profile_list(request):
@@ -49,7 +40,6 @@ def profile_list(request):
 def profile(request, pk):
     if request.user.is_authenticated:
         profile = Profile.objects.get(user_id=pk)
-        print(profile)
         darts = Dart.objects.filter(user_id=pk).order_by('-date_created')
 
         # POST form logic
@@ -219,16 +209,16 @@ def fetch_news_from_newsapi(request):
     story_count = 0
     for story in list_of_stories.json():
         story_count += 1
-        print(story_count)
         if story_count > 6:
             break
         story_url = f'https://hacker-news.firebaseio.com/v0/item/{story}.json?print=pretty'
         news_urls.append(story_url)
-    
-    # usse urls in news_urls to fetch news stories
         story_data = requests.get(story_url)
         story_json = story_data.json()
         news.append(story_json)
 
-    print(news)
     return news
+
+def fetch_news(request):
+    news = fetch_news_from_newsapi(request)
+    return JsonResponse({"news": news}, safe=False)
