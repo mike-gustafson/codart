@@ -214,6 +214,7 @@ def fetch_news_from_newsapi(request):
     import json
     url = 'https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty'
     list_of_stories = requests.get(url)
+    news = []
     news_urls = []
     story_count = 0
     for story in list_of_stories.json():
@@ -223,6 +224,11 @@ def fetch_news_from_newsapi(request):
             break
         story_url = f'https://hacker-news.firebaseio.com/v0/item/{story}.json?print=pretty'
         news_urls.append(story_url)
-    news = news_urls
+    
+    # usse urls in news_urls to fetch news stories
+        story_data = requests.get(story_url)
+        story_json = story_data.json()
+        news.append(story_json)
+
     print(news)
     return news
