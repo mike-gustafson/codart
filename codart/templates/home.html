@@ -5,9 +5,11 @@
     <div class="container">
         <div class="row">
             <div class="col-8">
+                {% if user.is_authenticated %}
                 <button type="button" class="btn btn-primary mb-1" data-bs-toggle="modal" data-bs-target="#dartModal" >
                     Throw a Dart
                 </button>
+                {% endif %}
                 {% for dart in darts %}
                         <div class="card border-secondary mb-3 col-10">
                             <h5 class="card-header p-0 m-0" style="height: 50px">
