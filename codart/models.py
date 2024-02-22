@@ -5,7 +5,7 @@ from PIL import Image
 
 # Create Dart model
 class Dart(models.Model):
-    user = models.ForeignKey(User, related_name="darts", on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(User, related_name="darts", on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     description = models.TextField(max_length=128)
     code_block = models.TextField(max_length=1024)

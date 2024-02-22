@@ -67,6 +67,7 @@ def profile(request, pk):
         return redirect('home')
 
 def login_user(request):
+    referer_url = request.META.get("HTTP_REFERER", 'home')
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -74,12 +75,13 @@ def login_user(request):
         if user is not None:
             login(request, user)
             messages.success(request, f'Welcome back {username}')
-            return redirect(request.META.get("HTTP_REFERER"))
+            referer_url = request.META.get("HTTP_REFERER", 'home')
+            return redirect(referer_url)
         else:
             messages.success(request, f'Error: Invalid username or password')
-            return redirect(request.META.get("HTTP_REFERER"))
+            return redirect(referer_url)
     else:
-        return redirect(request.META.get("HTTP_REFERER"))
+        return redirect(referer_url)
 
 def logout_user(request):
     logout(request)
@@ -99,9 +101,11 @@ def register_user(request):
             login(request, user)
 
             messages.success(request, f'Welcome {username}')
-            return redirect('home')
-        
-    return redirect('profile', pk=request.user.id)
+            return redirect('profile', pk=user.id)
+        else:
+            print(form.errors)
+            return JsonResponse(form.errors, status=400)
+    return redirect('home')
 
 def edit_profile(request):
     if request.user.is_authenticated:
@@ -120,7 +124,7 @@ def edit_profile(request):
         else:
             user_form = UserEditForm(instance=request.user)
             profile_form = ProfileForm(instance=request.user.profile)
-            return render(request, 'edit_profile.html', {'user_form': user_form, 'profile_form': profile_form})
+            return redirect('home')
 
 def dart_like(request, pk):
     if request.user.is_authenticated:
@@ -163,7 +167,7 @@ def dart_dislike(request, pk):
         return JsonResponse(responce)
     else:
         messages.success(request, f'You need to be logged in to like or dislike a dart')
-        return redirect(request.META.get("HTTP_REFERER"))
+        return redirect(request.META.get("HTTP_REFERER", 'home'))
     
 def delete_dart(request, pk):
     if request.user.is_authenticated:
@@ -171,7 +175,7 @@ def delete_dart(request, pk):
         if request.user.username == dart.user.username:
             dart.delete()
             messages.success(request, f'Dart deleted successfully')
-            return redirect(request.META.get("HTTP_REFERER"))
+            return redirect(request.META.get("HTTP_REFERER", 'home'))
     else:
         messages.success(request, f'You need to be logged in to delete a dart')
         return redirect('home')
