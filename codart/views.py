@@ -226,3 +226,6 @@ def fetch_news_from_newsapi(request):
 def fetch_news(request):
     news = fetch_news_from_newsapi(request)
     return JsonResponse({"news": news}, safe=False)
+
+def error_404(request, exception):
+    return render(request, '404.html', status=404)

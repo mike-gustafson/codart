@@ -14,12 +14,10 @@ class Dart(models.Model):
     likes = models.ManyToManyField(User, related_name='dart_likes', blank=True)
     dislikes = models.ManyToManyField(User, related_name='dart_dislikes', blank=True)
 
-
     # track number of likes
     def total_likes(self):
         return self.likes.count()
     
-
     # track number of dislikes
     def total_dislikes(self):
         return self.dislikes.count()
@@ -48,15 +46,6 @@ class Profile(models.Model):
     date_modified = models.DateTimeField(User, auto_now=True)
     dart_likes = models.ManyToManyField(Dart, related_name='dart_likes', blank=True)
     dart_dislikes = models.ManyToManyField(Dart, related_name='dart_dislikes', blank=True)
-
-    # def save(self, *args, **kwargs):
-    #     super(Profile, self).save(*args, **kwargs)
-    #     image = Image.open(self.profile_image.path)
-
-    #     if image.height > 300 or image.width > 300:
-    #         output_size = (300, 300)
-    #         image.thumbnail(output_size)
-    #         image.save(self.profile_image.path)
             
     def __str__(self):
         first_name = self.user.first_name
@@ -64,7 +53,6 @@ class Profile(models.Model):
         username = self.user.username
         return f"{first_name} {last_name}: @{username}"
 
-# create profile for each user on signup
 def create_profile(sender, instance, created, **kwargs):
     if created:
         user_profile = Profile(user=instance)
