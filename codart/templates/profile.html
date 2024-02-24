@@ -7,10 +7,6 @@
         <div class="row">
             <div class="col-8">
                 <h1>{{ profile.user.first_name }}'s profile</h1>
-                <span class="badge bg-secondary">{{ profile.user.email }}</span>
-                <span class="badge bg-secondary">{{ profile.date_modified }}</span>
-                
-                <br/><br/>
 
                 {% if profile.user.id == request.user.id %}
                 <div class="btn-group" role="group" aria-label="Darts Toggle">
@@ -25,14 +21,14 @@
                 <div id="savedDartsDisplay" style="display:none;">
                 {% if profile.user.dart_saved %}
                     {% for dart in profile.user.dart_saved.all %}
-                    <div class="card border-secondary mb-3 col-8">
+                    <div class="card border-secondary mb-3 col-10">
                         <h5 class="card-header p-0 m-0" style="height: 50px">
                             <img src="{{ dart.user.profile.profile_image.url }}" class="h-100 img-thumbnail rounded-circle" alt="{{ dart.user.first_name }} {{ dart.user.last_name }}'s Profile Photo">
                             <a href="{% url 'profile' dart.user.id %}">@{{ dart.user.username|lower }}</a>
                             {{ dart.title }}
                         </h5>
                         <div class="card-body text-secondary">
-                            <h5 class="card-title>{{ dart.description }}"></h5>
+                            <h5 class="card-title">{{ dart.description }}</h5>
                             <p class="card-text">
                                     <pre class="border border-secondary p-1"><code>{{ dart.code_block }}</code></pre>
                             </p>
@@ -43,12 +39,32 @@
                                     {% else %}
                                         No language specified
                                     {% endif %}
-                                    | posted: {{ dart.date_created }}
-                                </small>
-                            </p>
+                                    | posted: {{ dart.date_created }}</small></p>
                         </div>
-                    </div>  
-                    {% endfor %}
+
+                        <div class="card-footer bg-transparent border-secondary">
+                            <a href="#" class="like-btn {% if request.user in dart.likes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
+                                <i class="fa-solid fa-heart"></i>
+                                <span class="likes-count text-dark" style="text-decoration: none !important;"> {{ dart.likes.count }}</span>
+                            </a>
+                            ||
+                            <a href="#" class="dislike-btn {% if request.user in dart.dislikes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
+                                <i class="fa-solid fa-thumbs-down"></i>
+                                <span class="dislikes-count text-dark"> {{ dart.dislikes.count }}</span>
+                            </a>
+                            ||
+                            <a href="#" class="save-btn {% if request.user in dart.saved_by.all %}text-warning{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;">
+                                <i class="fa-solid fa-bookmark"></i>
+                            </a>
+                            {% if request.user.id == dart.user.id %}
+                            ||
+                                <a href="{% url 'delete_dart' dart.id %}"><i class="fa-solid fa-trash-can" style="color: green"></i></a>
+                            ||
+                                <a href="{% url 'edit_dart' dart.id %}"><i class="fa-solid fa-pencil" style="color: blue"></i></a>
+                            {% endif %}
+                        </div>  
+                    </div>
+                {% endfor %}
                 {% else %}
                     <h3>No Saved Darts</h3>
                 {% endif %}
@@ -57,7 +73,7 @@
                 <div id="dartsDisplay">
                 {% if darts %}
                     {% for dart in darts %}
-                    <div class="card border-secondary mb-3 col-8">
+                    <div class="card border-secondary mb-3 col-10">
                         <h5 class="card-header p-0 m-0" style="height: 50px">
                             <img src="{{ dart.user.profile.profile_image.url }}" class="h-100 img-thumbnail rounded-circle" alt="{{ dart.user.first_name }} {{ dart.user.last_name }}'s Profile Photo">
                             <a href="{% url 'profile' dart.user.id %}">@{{ dart.user.username|lower }}</a>
@@ -127,17 +143,11 @@
                     </h5>
                     <div class="card-body">
                         <p class="card-text text-start">
-                            <span class="">Username: {{ user.username }}</span><br/>
-                            <span class="">Name: {{ profile.user.first_name }} {{ profile.user.last_name }}</span><br/>
-                            <span class="">E-Mail: {{ profile.user.email }}</span><br/>
-                            <span class="">Last updated: {{ profile.date_modified }}</span><br/>
+                            <span class="badge bg-secondary">Username: {{ user.username }}</span><br/>
+                            <span class="badge bg-secondary">Name: {{ profile.user.first_name }} {{ profile.user.last_name }}</span><br/>
+                            <span class="badge bg-secondary">E-Mail: {{ profile.user.email }}</span><br/>
+                            <span class="badge bg-secondary">Last updated: {{ profile.date_modified }}</span><br/>
                         </p>
-                        <ul class="social mb-0 list-inline mt-3">
-                            <li class="list-inline-item"><a href="#" class="social-link"><i class="fa fa-facebook-f"></i></a></li>
-                            <li class="list-inline-item"><a href="#" class="social-link"><i class="fa fa-twitter"></i></a></li>
-                            <li class="list-inline-item"><a href="#" class="social-link"><i class="fa fa-instagram"></i></a></li>
-                            <li class="list-inline-item"><a href="#" class="social-link"><i class="fa fa-linkedin"></i></a></li>
-                        </ul>
                     </div>
                 </div>
                 <div class="card border-secondary mb-3">
@@ -176,6 +186,7 @@
                     </div>
                 </div>
                 <br/>
+                {% if request.user.id != profile.user.id %}
                 <form method=POST>
                     {% csrf_token %}
                     {% if profile in user.profile.follow.all %}
@@ -185,6 +196,7 @@
                     {% endif %}
                 </form>
                 <br/>
+                {% endif %}
             </div>
         </div>
     </div>  
@@ -281,7 +293,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("DOMContentLoaded", function() {
         var likeButtons = document.querySelectorAll('.like-btn');
         var dislikeButtons = document.querySelectorAll('.dislike-btn');
-    var saveButtons = document.querySelectorAll('.save-btn');
+        var saveButtons = document.querySelectorAll('.save-btn');
         var showDartsBtn = document.getElementById('showDarts');
         var showSavedDartsBtn = document.getElementById('showSavedDarts');
         var dartsDisplay = document.getElementById('dartsDisplay');
@@ -298,7 +310,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 button.classList.remove(...allColorClasses);
             }
         }
-    
+        
+
         likeButtons.forEach(function(button) {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
