@@ -13,6 +13,7 @@ class Dart(models.Model):
     code_language = models.CharField(max_length=100)
     likes = models.ManyToManyField(User, related_name='dart_likes', blank=True)
     dislikes = models.ManyToManyField(User, related_name='dart_dislikes', blank=True)
+    saved_by = models.ManyToManyField(User, related_name='dart_saved', blank=True)
 
     # track number of likes
     def total_likes(self):
@@ -46,7 +47,9 @@ class Profile(models.Model):
     date_modified = models.DateTimeField(User, auto_now=True)
     dart_likes = models.ManyToManyField(Dart, related_name='dart_likes', blank=True)
     dart_dislikes = models.ManyToManyField(Dart, related_name='dart_dislikes', blank=True)
-            
+    dart_saved = models.ManyToManyField(Dart, related_name='dart_saved', blank=True)
+
+
     def __str__(self):
         first_name = self.user.first_name
         last_name = self.user.last_name

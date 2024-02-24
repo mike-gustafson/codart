@@ -169,6 +169,31 @@ def dart_dislike(request, pk):
         messages.success(request, f'You need to be logged in to like or dislike a dart')
         return redirect(request.META.get("HTTP_REFERER", 'home'))
     
+def dart_save(request, pk):
+    if request.user.is_authenticated:
+        dart = get_object_or_404(Dart, id=pk)
+        current_user = request.user.profile
+
+        dartIsSaved = dart.saved_by.filter(id=request.user.id).exists()
+
+        if dartIsSaved:
+            dart.saved_by.remove(request.user)
+            current_user.dart_saved.remove(dart)
+        else:
+            dart.saved_by.add(request.user)
+            current_user.dart_saved.add(dart)
+
+        response = {
+            'saved_count': dart.saved_by.count(),
+            'saved': not dartIsSaved,
+        }
+
+        return JsonResponse(response)
+    
+    else:
+        messages.success(request, f'You need to be logged in to save a dart')
+        return redirect(request.META.get("HTTP_REFERER", 'home'))
+
 def delete_dart(request, pk):
     if request.user.is_authenticated:
         dart = get_object_or_404(Dart, id=pk)
@@ -213,7 +238,7 @@ def fetch_news_from_newsapi(request):
     story_count = 0
     for story in list_of_stories.json():
         story_count += 1
-        if story_count > 6:
+        if story_count > 16:
             break
         story_url = f'https://hacker-news.firebaseio.com/v0/item/{story}.json?print=pretty'
         news_urls.append(story_url)

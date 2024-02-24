@@ -34,15 +34,31 @@
                             </div>
 
                             <div class="card-footer bg-transparent border-secondary">
-                                <a href="#" class="like-btn {% if request.user in dart.likes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
+                                {% if request.user.is_authenticated %}
+                                <a href="#" class="like-btn {% if request.user in dart.likes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;">
                                     <i class="fa-solid fa-heart"></i>
                                     <span class="likes-count text-dark" style="text-decoration: none !important;"> {{ dart.likes.count }}</span>
                                 </a>
                                 ||
-                                <a href="#" class="dislike-btn {% if request.user in dart.dislikes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
+                                <a href="#" class="dislike-btn {% if request.user in dart.dislikes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;">
                                     <i class="fa-solid fa-thumbs-down"></i>
                                     <span class="dislikes-count text-dark"> {{ dart.dislikes.count }}</span>
                                 </a>
+                                ||
+                                <a href="#" class="save-btn {% if request.user in dart.saved_by.all %}text-warning{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;">
+                                    <i class="fa-solid fa-bookmark"></i>
+                                </a>
+                                ||
+                                Comments: {{ dart.comments.count }}
+                                {% else %}
+                                <i class="fa-solid fa-heart"></i>
+                                <span class="likes-count text-dark" style="text-decoration: none !important;"> {{ dart.likes.count }}</span>
+                                ||
+                                <i class="fa-solid fa-thumbs-down"></i>
+                                <span class="dislikes-count text-dark"> {{ dart.dislikes.count }}</span>
+                                ||
+                                Comments: {{ dart.comments.count }}
+                                {% endif %}
                             </div>
                         </div>
                     {% endfor %}
@@ -99,7 +115,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     var likeButtons = document.querySelectorAll('.like-btn');
     var dislikeButtons = document.querySelectorAll('.dislike-btn');
-    
+    var saveButtons = document.querySelectorAll('.save-btn');
     var csrfToken = '{{ csrf_token }}';
 
     function toggleButtonState(button, isActive, colorClass) {
@@ -167,9 +183,30 @@ document.addEventListener("DOMContentLoaded", function() {
                 dislikesCountElem.textContent = data.dislikes_count;
 
                 var likeButton = card.querySelector('.like-btn');
-                toggleButtonState(this, data.disliked, 'text-warning');
+                toggleButtonState(this, data.disliked, 'text-danger');
                 toggleButtonState(likeButton, false, null);
             })
+        });
+    });
+
+    saveButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            var dartId = this.getAttribute('data-dart-id');
+            var url = `{% url 'dart_save' 0 %}`.replace('/0/', `/${dartId}/`);
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({'dart_id': dartId})
+            })
+            .then(response => response.json())
+            .then(data => {
+                toggleButtonState(this, data.saved, 'text-warning');
+            });
         });
     });
 });
@@ -184,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
             storyElement.innerHTML = `
             <a href="${story.url}" target="_blank" class="text-decoration-none">
             <div class="card border border-secondary rounded my-1 hover-overlay">
-                <h3>${story.title}</h3>
+                <h5>${story.title}</h5>
                 <p>${story.by}</p>
                 </div>
                 </a>

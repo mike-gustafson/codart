@@ -11,6 +11,7 @@ urlpatterns = [
     path('edit_profile/', views.edit_profile, name='edit_profile'),
     path('dart_like/<int:pk>/', views.dart_like, name='dart_like'),
     path('dart_dislike/<int:pk>/', views.dart_dislike, name='dart_dislike'),
+    path('dart_save/<int:pk>/', views.dart_save, name='dart_save'),
     path('delete_dart/<int:pk>/', views.delete_dart, name='delete_dart'),
     path('delete_profile/', views.delete_profile, name='delete_profile'),
     path('edit_dart/<int:pk>/', views.edit_dart, name='edit_dart'),
