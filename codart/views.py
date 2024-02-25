@@ -174,7 +174,6 @@ def dart_save(request, pk):
     if request.user.is_authenticated:
         dart = get_object_or_404(Dart, id=pk)
         current_user = request.user.profile
-
         dartIsSaved = dart.saved_by.filter(id=request.user.id).exists()
 
         if dartIsSaved:
