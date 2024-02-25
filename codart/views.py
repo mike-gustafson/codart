@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Profile, Dart
+from .models import Profile, Dart, Comment
 from .forms import DartForm, SignUpForm, ProfileForm, UserEditForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
 from django.http import JsonResponse
+from django.utils import timezone
 # Create your views here.
 def home(request):
     if request.user.is_authenticated:
@@ -228,6 +229,30 @@ def edit_dart(request, pk):
         messages.success(request, f'You need to be logged in to edit a dart')
         return redirect('home')
     
+def comment(request, pk):
+    if request.user.is_authenticated:
+        dart = get_object_or_404(Dart, id=pk)
+        print(dart)
+        if request.method == 'POST':
+            comment = request.POST['comment']
+            dart.comments.create(user=request.user, comment=comment, date_created=timezone.now())
+            messages.success(request, f'Comment added successfully')
+            return redirect(request.META.get("HTTP_REFERER", 'home'))
+    else:
+        messages.success(request, f'You need to be logged in to comment on a dart')
+        return redirect('home')
+
+def delete_comment(request, pk):
+    if request.user.is_authenticated:
+        comment = get_object_or_404(Comment, id=pk)
+        if request.user.username == comment.user.username:
+            comment.delete()
+            messages.success(request, f'Comment deleted successfully')
+            return redirect(request.META.get("HTTP_REFERER", 'home'))
+    else:
+        messages.success(request, f'You need to be logged in to delete a comment')
+        return redirect('home')
+
 def fetch_news_from_newsapi(request):
     import requests
     import json
@@ -245,7 +270,6 @@ def fetch_news_from_newsapi(request):
         story_data = requests.get(story_url)
         story_json = story_data.json()
         news.append(story_json)
-
     return news
 
 def fetch_news(request):

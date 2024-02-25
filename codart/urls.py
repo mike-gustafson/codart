@@ -16,6 +16,8 @@ urlpatterns = [
     path('delete_profile/', views.delete_profile, name='delete_profile'),
     path('edit_dart/<int:pk>/', views.edit_dart, name='edit_dart'),
     path('fetch-news/', views.fetch_news, name='fetch-news'),
+    path('comment/<int:pk>/', views.comment, name='comment'),
+    path('delete_comment/<int:pk>/', views.delete_comment, name='delete_comment'),
     path('404/', views.error_404, name='error_404', kwargs={'exception': Exception()}),
 ]
 

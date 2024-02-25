@@ -13,7 +13,7 @@ class Dart(models.Model):
     code_language = models.CharField(max_length=100)
     likes = models.ManyToManyField(User, related_name='dart_likes', blank=True)
     dislikes = models.ManyToManyField(User, related_name='dart_dislikes', blank=True)
-    saved_by = models.ManyToManyField(User, related_name='dart_saved', blank=True)
+    saved_by = models.ManyToManyField(User, related_name='dart_saved', blank=True),
 
     # track number of likes
     def total_likes(self):
@@ -27,6 +27,18 @@ class Dart(models.Model):
         return(
             f"User: {self.user}, Title: {self.title}, Description: {self.description}, Code Block: {self.code_block}"
         )
+
+class Comment(models.Model):
+    dart = models.ForeignKey(Dart, related_name='comments', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment = models.TextField(max_length=256)
+    date_created = models.DateTimeField(auto_now_add=True)
+    comment_likes = models.ManyToManyField(User, related_name='comment_likes', blank=True)
+    comment_dislikes = models.ManyToManyField(User, related_name='comment_dislikes', blank=True)
+    
+
+    def __str__(self):
+        return f"User: {self.user}, Dart: {self.dart}, Comment: {self.body}"
 
 # Model for saving hacker-news articles to the database in order to keep load times down
 class NewsStory(models.Model):

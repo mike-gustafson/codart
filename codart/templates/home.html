@@ -60,8 +60,33 @@
                                 Comments: {{ dart.comments.count }}
                                 {% endif %}
                             </div>
-                        </div>
-                    {% endfor %}
+                            {% if request.user.is_authenticated %}
+                                <form method="POST" action="{% url 'comment' dart.id %}">
+                                    {% csrf_token %}
+                                    <div class="input-group m-0">
+                                        <input type="text" class="form-control" placeholder="Add a comment" name="comment" aria-label="Add a comment" aria-describedby="button-addon2" required="true">
+                                        <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Comment</button>
+                                    </div>
+                                </form>
+                            {% endif %}
+                            {% if dart.comments.count > 0 %}
+                            <div class="card border-secondary col-12 col-md-10 mx-auto mt-1">
+                                {% for comment in dart.comments.all %}
+                                <div class="card-body text-secondary">
+                                    <strong class="text-dark">{{ comment.user.username|upper }}:</strong>
+                                    <span class="text-small text-dark">{{ comment.comment }}</span><br/>
+                                        <small class="text-body-secondary">posted: {{ comment.date_created }}</small>
+                                        {% if comment.user == request.user %}
+                                <a href="{% url 'delete_comment' comment.id %}" class="text-danger"><i class="fa-solid fa-trash-can" style="color: green"></i></a>
+                                {% endif %}
+                                
+                                </div>  
+                                <hr class="m-0"/>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            </div>
+                        {% endfor %}
             </div>
             <div class="col-md-4">
                 
