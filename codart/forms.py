@@ -105,6 +105,9 @@ LANGUAGE_CHOICES = [
     ('oberon', 'Oberon'),
     ('modula-2', 'Modula-2'),
     ('j', 'J'),
+    ('apl', 'APL'),
+    ('basic', 'BASIC'),
+    ('other', 'Other'),
 ]
 
 class DartForm(forms.ModelForm):
