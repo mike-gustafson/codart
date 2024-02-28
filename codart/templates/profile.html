@@ -4,129 +4,8 @@
 {% if profile %}
 
     <div class="container">
-        <div class="row">
-            <div class="col-8">
-                <h1>{{ profile.user.first_name }}'s profile</h1>
-
-                {% if profile.user.id == request.user.id %}
-                <div class="btn-group" role="group" aria-label="Darts Toggle">
-                    <button type="button" class="btn btn-primary" id="showDarts">Your Darts</button>
-                    {% if profile.user.dart_saved.count > 0 %}
-                        <button type="button" class="btn btn-secondary" id="showSavedDarts">Saved Darts</button>
-                    {% endif %}
-                </div>
-                <br/><br/>
-                {% endif %}
-
-                <div id="savedDartsDisplay" style="display:none;">
-                {% if profile.user.dart_saved %}
-                    {% for dart in profile.user.dart_saved.all %}
-                    <div class="card border-secondary mb-3 col-10">
-                        <h5 class="card-header p-0 m-0" style="height: 50px">
-                            <img src="{{ dart.user.profile.profile_image.url }}" class="h-100 img-thumbnail rounded-circle" alt="{{ dart.user.first_name }} {{ dart.user.last_name }}'s Profile Photo">
-                            <a href="{% url 'profile' dart.user.id %}">@{{ dart.user.username|lower }}</a>
-                            {{ dart.title }}
-                        </h5>
-                        <div class="card-body text-secondary">
-                            <h5 class="card-title">{{ dart.description }}</h5>
-                            <p class="card-text">
-                                    <pre class="border border-secondary p-1"><code>{{ dart.code_block }}</code></pre>
-                            </p>
-                            <p class="card-text">
-                                <small class="text-body-secondary">
-                                    {% if dart.code_language %}
-                                        <b>{{ dart.code_language }}</b>
-                                    {% else %}
-                                        No language specified
-                                    {% endif %}
-                                    | posted: {{ dart.date_created }}</small></p>
-                        </div>
-
-                        <div class="card-footer bg-transparent border-secondary">
-                            <a href="#" class="like-btn {% if request.user in dart.likes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
-                                <i class="fa-solid fa-heart"></i>
-                                <span class="likes-count text-dark" style="text-decoration: none !important;"> {{ dart.likes.count }}</span>
-                            </a>
-                            ||
-                            <a href="#" class="dislike-btn {% if request.user in dart.dislikes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
-                                <i class="fa-solid fa-thumbs-down"></i>
-                                <span class="dislikes-count text-dark"> {{ dart.dislikes.count }}</span>
-                            </a>
-                            ||
-                            <a href="#" class="save-btn {% if request.user in dart.saved_by.all %}text-warning{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;">
-                                <i class="fa-solid fa-bookmark"></i>
-                            </a>
-                            {% if request.user.id == dart.user.id %}
-                            ||
-                                <a href="{% url 'delete_dart' dart.id %}"><i class="fa-solid fa-trash-can" style="color: green"></i></a>
-                            ||
-                                <a href="{% url 'edit_dart' dart.id %}"><i class="fa-solid fa-pencil" style="color: blue"></i></a>
-                            {% endif %}
-                        </div>  
-                    </div>
-                {% endfor %}
-                {% else %}
-                    <h3>No Saved Darts</h3>
-                {% endif %}
-                </div>
-                
-                <div id="dartsDisplay">
-                {% if darts %}
-                    {% for dart in darts %}
-                    <div class="card border-secondary mb-3 col-10">
-                        <h5 class="card-header p-0 m-0" style="height: 50px">
-                            <img src="{{ dart.user.profile.profile_image.url }}" class="h-100 img-thumbnail rounded-circle" alt="{{ dart.user.first_name }} {{ dart.user.last_name }}'s Profile Photo">
-                            <a href="{% url 'profile' dart.user.id %}">@{{ dart.user.username|lower }}</a>
-                            {{ dart.title }}
-                        </h5>
-                        <div class="card-body text-secondary">
-                            <h5 class="card-title">{{ dart.description }}</h5>
-                            <p class="card-text">
-                                    <pre class="border border-secondary p-1"><code>{{ dart.code_block }}</code></pre>
-                            </p>
-                            <p class="card-text">
-                                <small class="text-body-secondary">
-                                    {% if dart.code_language %}
-                                        <b>{{ dart.code_language }}</b>
-                                    {% else %}
-                                        No language specified
-                                    {% endif %}
-                                    | posted: {{ dart.date_created }}</small></p>
-                        </div>
-
-                        <div class="card-footer bg-transparent border-secondary">
-                            <a href="#" class="like-btn {% if request.user in dart.likes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
-                                <i class="fa-solid fa-heart"></i>
-                                <span class="likes-count text-dark" style="text-decoration: none !important;"> {{ dart.likes.count }}</span>
-                            </a>
-                            ||
-                            <a href="#" class="dislike-btn {% if request.user in dart.dislikes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
-                                <i class="fa-solid fa-thumbs-down"></i>
-                                <span class="dislikes-count text-dark"> {{ dart.dislikes.count }}</span>
-                            </a>
-                            ||
-                            <a href="#" class="save-btn {% if request.user in dart.saved_by.all %}text-warning{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;">
-                                <i class="fa-solid fa-bookmark"></i>
-                            </a>
-                            {% if request.user.id == dart.user.id %}
-                            ||
-                                <a href="{% url 'delete_dart' dart.id %}"><i class="fa-solid fa-trash-can" style="color: green"></i></a>
-                            ||
-                                <a href="{% url 'edit_dart' dart.id %}"><i class="fa-solid fa-pencil" style="color: blue"></i></a>
-                            {% endif %}
-                        </div>  
-                    </div>
-                {% endfor %}
-                    
-                {% else %}
-                    <h3>No Darts</h3>
-                {% endif %}
-                </div>
-            
-            </div>
-
-            <div class="col-4 text-center">
-
+        <div class="row">    
+            <div class="col-md-4 text-center col-12">
                 {% if profile.profile_image %}
                     <img src="{{ profile.profile_image.url }}" class="col-6 img-thumbnail rounded-pill" alt="Profile Image">
                 {% endif %}
@@ -134,7 +13,7 @@
                 <br/>
                 <div class="card border-secondary mb-3">
                     <h5 class="card-header">
-                        User Details
+                        @{{ profile.user.username|upper }}
                         {% if request.user.id == profile.user.id %}
                             <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal">
                                 Edit
@@ -150,7 +29,7 @@
                         </p>
                     </div>
                 </div>
-                <div class="card border-secondary mb-3">
+                <div class="card border-secondary mb-3 ">
                     <h5 class="card-header">Followed By</h5>
                     <div class="card-body p-0">
                             {% for followed_by in profile.followed_by.all %}
@@ -197,6 +76,121 @@
                 </form>
                 <br/>
                 {% endif %}
+            </div>
+        <div class="col-md-8 col-12">
+            {% if profile.user.id == request.user.id %}
+            <div class="btn-group" role="group" aria-label="Darts Toggle">
+                <button type="button" class="btn btn-primary" id="showDarts">Your Darts</button>
+                {% if profile.user.dart_saved.count > 0 %}
+                    <button type="button" class="btn btn-secondary" id="showSavedDarts">Saved Darts</button>
+                {% endif %}
+            </div>
+            <br/><br/>
+            {% endif %}
+
+            <div id="savedDartsDisplay" style="display:none">
+            {% if profile.user.dart_saved %}
+                {% for dart in profile.user.dart_saved.all %}
+                <div class="card border-secondary mb-3 col-10">
+                    <h5 class="card-header p-0 m-0" style="height: 50px">
+                        <img src="{{ dart.user.profile.profile_image.url }}" class="h-100 img-thumbnail rounded-circle" alt="{{ dart.user.first_name }} {{ dart.user.last_name }}'s Profile Photo">
+                        <a href="{% url 'profile' dart.user.id %}">@{{ dart.user.username|lower }}</a>
+                        {{ dart.title }}
+                    </h5>
+                    <div class="card-body text-secondary">
+                        <h5 class="card-title">{{ dart.description }}</h5>
+                        <p class="card-text">
+                                <pre class="border border-secondary p-1"><code>{{ dart.code_block }}</code></pre>
+                        </p>
+                        <p class="card-text">
+                            <small class="text-body-secondary">
+                                {% if dart.code_language %}
+                                    <b>{{ dart.code_language }}</b>
+                                {% else %}
+                                    No language specified
+                                {% endif %}
+                                | posted: {{ dart.date_created }}</small></p>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-secondary">
+                        <a href="#" class="like-btn {% if request.user in dart.likes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
+                            <i class="fa-solid fa-heart"></i>
+                            <span class="likes-count text-dark" style="text-decoration: none !important;"> {{ dart.likes.count }}</span>
+                        </a>
+                        ||
+                        <a href="#" class="dislike-btn {% if request.user in dart.dislikes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
+                            <i class="fa-solid fa-thumbs-down"></i>
+                            <span class="dislikes-count text-dark"> {{ dart.dislikes.count }}</span>
+                        </a>
+                        ||
+                        <a href="#" class="save-btn {% if request.user in dart.saved_by.all %}text-warning{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;">
+                            <i class="fa-solid fa-bookmark"></i>
+                        </a>
+                        {% if request.user.id == dart.user.id %}
+                        ||
+                            <a href="{% url 'delete_dart' dart.id %}"><i class="fa-solid fa-trash-can" style="color: green"></i></a>
+                        ||
+                            <a href="{% url 'edit_dart' dart.id %}"><i class="fa-solid fa-pencil" style="color: blue"></i></a>
+                        {% endif %}
+                    </div>  
+                </div>
+                {% endfor %}
+            {% else %}
+                <h3>No Saved Darts</h3>
+            {% endif %}
+            </div>
+            
+            <div id="dartsDisplay">
+            {% if darts %}
+                {% for dart in darts %}
+                <div class="card border-secondary mb-3 col-md-10 ">
+                    <h5 class="card-header p-0 m-0" style="height: 50px">
+                        <img src="{{ dart.user.profile.profile_image.url }}" class="h-100 img-thumbnail rounded-circle" alt="{{ dart.user.first_name }} {{ dart.user.last_name }}'s Profile Photo">
+                        <a href="{% url 'profile' dart.user.id %}">@{{ dart.user.username|lower }}</a>
+                        {{ dart.title }}
+                    </h5>
+                    <div class="card-body text-secondary">
+                        <h5 class="card-title">{{ dart.description }}</h5>
+                        <p class="card-text">
+                                <pre class="border border-secondary p-1"><code>{{ dart.code_block }}</code></pre>
+                        </p>
+                        <p class="card-text">
+                            <small class="text-body-secondary">
+                                {% if dart.code_language %}
+                                    <b>{{ dart.code_language }}</b>
+                                {% else %}
+                                    No language specified
+                                {% endif %}
+                                | posted: {{ dart.date_created }}</small></p>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-secondary">
+                        <a href="#" class="like-btn {% if request.user in dart.likes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
+                            <i class="fa-solid fa-heart"></i>
+                            <span class="likes-count text-dark" style="text-decoration: none !important;"> {{ dart.likes.count }}</span>
+                        </a>
+                        ||
+                        <a href="#" class="dislike-btn {% if request.user in dart.dislikes.all %}text-danger{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;"">
+                            <i class="fa-solid fa-thumbs-down"></i>
+                            <span class="dislikes-count text-dark"> {{ dart.dislikes.count }}</span>
+                        </a>
+                        ||
+                        <a href="#" class="save-btn {% if request.user in dart.saved_by.all %}text-warning{% else %}text-muted{% endif %}" data-dart-id="{{ dart.id }}" style="text-decoration: none !important;">
+                            <i class="fa-solid fa-bookmark"></i>
+                        </a>
+                        {% if request.user.id == dart.user.id %}
+                        ||
+                            <a href="{% url 'delete_dart' dart.id %}"><i class="fa-solid fa-trash-can" style="color: green"></i></a>
+                        ||
+                            <a href="{% url 'edit_dart' dart.id %}"><i class="fa-solid fa-pencil" style="color: blue"></i></a>
+                        {% endif %}
+                    </div>  
+                </div>
+            {% endfor %}
+                
+            {% else %}
+                <h3>No Darts</h3>
+            {% endif %}
             </div>
         </div>
     </div>  

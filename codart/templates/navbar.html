@@ -65,8 +65,8 @@
                             <a href="{% url 'logout' %}" class="btn btn-outline-secondary">Logout</a>
                         </div>
                     {% else %}
-                        <div class="col-6 offset-md-3">    
-                            <form method=POST action="{% url 'login' %}">
+                    <div class="col-md-6 col-12 offset-0 offset-md-3">    
+                        <form method=POST action="{% url 'login' %}">
                                 {% csrf_token %}
                                 <div class="mb-3">
                                     <input type="text" class="form-control" name="username" placeholder="Enter your username">
@@ -99,13 +99,13 @@
             <div class="modal-body">
                 <div class="row">
                     {% if user.is_authenticated %}
-                        <div class="col-8 offset-md-3">
+                        <div class="col-md-8 offset-md-3 col-12 offset-0">
                             <h1> You are already logged in </h1>
                             <br/>
                             <a href="{% url 'logout' %}" class="btn btn-outline-secondary">Logout</a>
                         </div>
                     {% else %}
-                        <div class="col-6 offset-md-3">    
+                        <div class="col-md-6 col-12 offset-0 offset-md-3">    
                             <form method=POST action="{% url 'register' %}">
                                 {% csrf_token %}
                                 <div class="mb-3">
