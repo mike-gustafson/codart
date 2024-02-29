@@ -31,7 +31,6 @@ Mention the technologies, frameworks, and libraries used in Codart. For example:
 - Django
 - Postgres
 - HTML/CSS/JavaScript
-- Django REST Framework
 - Bootstrap
 
 ## Setup
