@@ -29,7 +29,7 @@ Key features:
 
 Mention the technologies, frameworks, and libraries used in Codart. For example:
 - Django
-- SQLite3
+- Postgres
 - HTML/CSS/JavaScript
 - Django REST Framework
 - Bootstrap
