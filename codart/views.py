@@ -104,8 +104,8 @@ def register_user(request):
             messages.success(request, f'Welcome {username}')
             return redirect('profile', pk=user.id)
         else:
-            print(form.errors)
-            return JsonResponse(form.errors, status=400)
+            messages.success(request, f'Error: Signup failed, please try again')
+            return redirect('home')
     return redirect('home')
 
 def edit_profile(request):
